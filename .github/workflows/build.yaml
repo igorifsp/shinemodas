@@ -77,9 +77,16 @@ jobs:
 
       - name: Helm upgrade
         run: |
+          export KUBECONFIG=$HOME/.kube/config
+
           echo "Deploying version: $VERSION"
+
+          if [ ! -s "$KUBECONFIG" ]; then
+            echo "ERRO: O arquivo kubeconfig está vazio! Verifique a Secret no GitHub."
+            exit 1
+          fi
 
           helm upgrade --install $APPLICATION ./$HELM_PATH \
           --set image.repository=$DOCKER_IMAGE \
           --set image.tag=$VERSION \
-          --wait # Espera os pods ficarem Ready antes de dar sucesso
+          --wait
